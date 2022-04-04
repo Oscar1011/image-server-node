@@ -4,8 +4,13 @@ FROM mhart/alpine-node:12
 # Otherwise, you can use `tini`:
 # RUN apk add --no-cache tini
 # ENTRYPOINT ["/sbin/tini", "--"]
-RUN git clone https://github.com/Oscar1011/image-server-node.git /app
+
+
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
 COPY . .
 
 # If you have native dependencies, you'll need extra tools
