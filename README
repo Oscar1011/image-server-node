@@ -1,3 +1,7 @@
+docker exec -it mongo mongo admin
+用户密码与config.js对应
+db.createUser({ user:'username',pwd:'password',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},"readWriteAnyDatabase"]});
+
 expressjs+agenda+mongo+sharpjs制作的图片服务器，可在线处理图片并且缓存至服务器，支持height，width，format参数，支持判断浏览器是否支持WEBP，然后返回webp或者jpg。
 
 设置config/config.js:
