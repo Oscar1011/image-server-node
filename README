@@ -1,38 +1,53 @@
-docker exec -it mongo mongo admin
-用户密码与config.js对应
-db.createUser({ user:'username',pwd:'password',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},"readWriteAnyDatabase"]});
+# 使用说明
+复制一份 config/config.js，修改后映射到容器路径/data/config/config.js
 
-expressjs+agenda+mongo+sharpjs制作的图片服务器，可在线处理图片并且缓存至服务器，支持height，width，format参数，支持判断浏览器是否支持WEBP，然后返回webp或者jpg。
+    module.exports = {
+      dbUrl: "127.0.0.1",   //数据库ip。建议修改为主机ip地址，docker通过此地址是是无法访问到数据库的
+      db: "admin",      //数据库名称
+      dbUser: "imageserver",  //数据库用户名称
+      dbPassword: "imageserver",  //数据库密码
+      jwtSecret: 'imageserversecret',
+      jwtExpires: '30 days',
+      whiteLists: [],    //白名单
+      keeptime: 3 //缓存文件的保存时间 单位分钟 Minutes
+    };
 
-设置config/config.js:
-```
-module.exports = {
-  dbUrl: "127.0.0.1",
-  db: "imageserver",
-  dbUser: "imageserver",
-  dbPassword: "imageserver",
-  keeptime: 3, //单位分钟 Minutes
-  whiteLists: [
-    'image.querydata.org'
-  ]
-};
-```
-keeptime为文件保留分钟，每次请求会刷新文件的lastseen时间，只有那些lastseen时间超过设置的keeptime的会进行删除！
+docker composer.xml配置
 
-whiteLists设置仅处理哪些域名的图片，不带协议！若留空数组即[]，则可对任意网站的图片生效！
+    version: "3.8"
+    services:
+      image-server-node:
+        image: oscar1011/image_server_node
+        container_name: imageservernode
+        network_mode: "bridge"
+        ports:
+          - "3000:3000"
+        volumes:
+          - /volume/data/config/config.js:/data/config/config.js
+        depends_on:
+          - mongodb-myapp
+      mongodb-myapp:
+         image: mongo:4.4.6
+         container_name: mongodb-imageservernode
+         volumes:
+            -  /volume3/docker/imageserver/mongo:/data/db
+         ports:
+            - "27017:27017"
 
-支持jpg和png的在线处理。
+mongodb docker容器启动完成后，使用
 
-测试链接：
-https://imageserver.querydata.org/api?url=https://wmdb.querydata.org/movie/poster/no-poster.jpg&width=200&format=webp
+    docker exec -it mongodb-imageservernode mongo admin
 
-已经做了白名单，仅用于image.querydata.org中的图片处理。
+进入容器内部，执行
 
-用于wmdb项目：
-https://github.com/iiiiiii1/douban-imdb-api
+    db.createUser({ user:'username',pwd:'password',roles:[ { role:'userAdminAnyDatabase', db: 'admin'},"readWriteAnyDatabase"]});
 
-运行之后，访问/api?url=imageurl&width=200&height=300&format=webp，即可看见处理之后图片。
+上面的命令中， ‘username’与‘password’对应config.js中的
 
-format支持webp,jpg和png三个参数，推荐使用format=webp，会根据浏览器是否支持webp来返回webp格式图片或者jpg格式图片。
+    dbUser: "imageserver",
+    dbPassword: "imageserver"
 
-width和height，至少存在其中一个，当单独只有其中一个参数时，则另外一个参数会自适应处理！
+请确保两者一致。
+
+
+### 基于 https://github.com/bookyo/image-server-node 制作的docker容器，接口使用说明参见原项目，不再赘述
