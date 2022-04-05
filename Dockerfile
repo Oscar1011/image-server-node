@@ -1,4 +1,4 @@
-FROM node:12.2.0-alpine
+FROM node:12
 
 # If possible, run your container using `docker run --init`
 # Otherwise, you can use `tini`:
