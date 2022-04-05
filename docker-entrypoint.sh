@@ -5,3 +5,4 @@ if [ -s /data/config/config.js ]; then
   cp /data/config/config.js /app/config/config.js
 fi
 node app.js
+exec "$@"
