@@ -18,4 +18,5 @@ COPY . .
 
 #RUN npm ci --prod
 
-CMD ["node", "app.js"]
+
+ENTRYPOINT docker-entrypoint.sh
