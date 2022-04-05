@@ -18,5 +18,5 @@ COPY . .
 
 #RUN npm ci --prod
 
-
+COPY docker-entrypoint.sh .
 ENTRYPOINT ["/app/docker-entrypoint.sh"] 
