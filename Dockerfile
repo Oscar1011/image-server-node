@@ -18,5 +18,6 @@ COPY . .
 
 #RUN npm ci --prod
 
-COPY docker-entrypoint.sh .
+#COPY docker-entrypoint.sh .
+RUN chmod +x /usr/src/app/entrypoint.sh
 ENTRYPOINT ["/app/docker-entrypoint.sh"] 
